@@ -171,8 +171,23 @@ fig = px.line(
     color_discrete_sequence=["#00E5FF", "#FF4081"]
 )
 
+# ✅ ANNOTATION (highest sales point)
+max_row = trend.loc[trend["Sales"].idxmax()]
+fig.add_annotation(
+    x=max_row["Order Date"],
+    y=max_row["Sales"],
+    text="Peak Sales",
+    showarrow=True,
+    arrowhead=2
+)
 st.plotly_chart(fig, use_container_width=True)
 
+
+# ✅ HOVER HINT
+# st.caption("💡 Hover over the chart to view detailed values")
+
+# ✅ INSIGHT
+st.info("Sales and profit show an overall trend, with peak performance in highlighted period.")
 # =========================
 # TABS
 # =========================
@@ -188,27 +203,54 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # -------------------------
 # TAB 1 - PIE
 # -------------------------
+# with tab1:
+#     region_sales = filtered_df.groupby("Region")["Sales"].sum().reset_index()
+
+#     fig = px.pie(
+#         region_sales,
+#         names="Region",
+#         values="Sales",
+#         hole=0.4,
+#         template="plotly_dark",
+#         color_discrete_sequence=px.colors.sequential.RdBu
+#     )
+#     fig.update_traces(
+#         textfont=dict(color="white", size=14),
+#         textinfo="percent+label"   # show label + %
+#     )
+
+#         # ✅ LEGEND WHITE
+#     fig.update_layout(
+#         legend=dict(font=dict(color="white"))
+#     )
+
+    
+#     st.plotly_chart(fig, use_container_width=True)
+
+
 with tab1:
     region_sales = filtered_df.groupby("Region")["Sales"].sum().reset_index()
+    fig = px.pie(region_sales, names="Region", values="Sales", hole=0.4)
+
+    max_region = region_sales.loc[region_sales["Sales"].idxmax()]
+    fig.add_annotation(text=f"Top Region: {max_region['Region']}", x=0.5, y=1.1, showarrow=False)
+
 
     fig = px.pie(
-        region_sales,
-        names="Region",
-        values="Sales",
-        hole=0.4,
-        template="plotly_dark",
-        color_discrete_sequence=px.colors.sequential.RdBu
-    )
-    fig.update_traces(
-        textfont=dict(color="white", size=14),
-        textinfo="percent+label"   # show label + %
-    )
-
-        # ✅ LEGEND WHITE
-    fig.update_layout(
-        legend=dict(font=dict(color="white"))
-    )
+    region_sales,
+    names="Region",
+    values="Sales",
+    hole=0.4,
+    template="plotly_dark",
+    color_discrete_sequence=px.colors.sequential.RdBu
+)
+    
+    fig.update_traces( 
+        textfont=dict(color="white", size=14), 
+        textinfo="percent"  )
     st.plotly_chart(fig, use_container_width=True)
+    # st.caption("💡 Hover to see percentage")
+    st.info("Top region contributes highest revenue.")
 
 # -------------------------
 # TAB 2 - PRODUCT BAR
@@ -230,7 +272,15 @@ with tab2:
         color="Sales",
         color_continuous_scale="Viridis"
     )
+
+    top_product = product_sales.iloc[0]
+    fig.add_annotation(x=top_product["Sales"], y=top_product["Product Name"],
+                       text="Top Product", showarrow=True)
     st.plotly_chart(fig, use_container_width=True)
+    # st.caption("💡 Hover to see values")
+    st.info("Top products dominate revenue.")
+
+
 
 # -------------------------
 # TAB 3 - HISTOGRAM
@@ -243,8 +293,12 @@ with tab3:
         template="plotly_dark",
         color_discrete_sequence=["#00E5FF"]
     )
-    st.plotly_chart(fig, use_container_width=True)
 
+    fig.add_annotation(x=6, y=10, text="Delay Zone", showarrow=True)
+
+    st.plotly_chart(fig, use_container_width=True)
+    # st.caption("💡 Hover to analyze distribution")
+    st.info("Delays above 5 days indicate inefficiency.")
 # -------------------------
 # TAB 4 - MAP (FIXED)
 # -------------------------
@@ -282,54 +336,75 @@ with tab4:
         color_continuous_scale="Turbo"
     )
 
+
+    fig.update_layout(
+    geo=dict(
+        bgcolor="rgba(0,0,0,0)",   # transparent background
+        lakecolor="white",
+        landcolor="lightgray"
+
+    )
+)
+    
+    fig.update_layout(
+        height=600
+    )
+
+    fig.add_annotation(text="Darker = slower delivery", x=0.5, y=0, showarrow=False)
+
     fig.update_traces(
         hovertemplate="State: %{location}<br>Shipping Time: %{z} days"
     )
 
     st.plotly_chart(fig, use_container_width=True)
-
+    # st.caption("💡 Hover over map")
+    st.info("Some states show higher delays.")
 # =========================
 # FACTORY SIMULATOR
 # =========================
 st.subheader("🏭 Factory Optimization Simulator")
 
-factory = st.selectbox(
-    "Select Factory",
-    ["Factory A", "Factory B", "Factory C"]
-)
+factory = st.selectbox("Factory", ["A","B","C"])
+effect = {"A":1,"B":2,"C":3}
 
-effect = {"Factory A": 1, "Factory B": 2, "Factory C": 3}
+# effect = {"Factory A": 1, "Factory B": 2, "Factory C": 3}
 
-filtered_df['optimized_time'] = (
-    filtered_df['shipping_time'] - effect[factory]
-).clip(lower=1)
-
-col1, col2, col3 = st.columns(3)
+filtered_df['optimized_time'] = (filtered_df['shipping_time'] - effect[factory]).clip(lower=1)
 
 current = filtered_df['shipping_time'].mean()
 optimized = filtered_df['optimized_time'].mean()
-improve = ((current - optimized) / current) * 100
 
-col1.metric("Current Avg Time", f"{current:.2f} days")
-col2.metric("Optimized Avg Time", f"{optimized:.2f} days")
-col3.metric("Improvement %", f"{improve:.1f}%")
-
-# Chart
 compare_df = pd.DataFrame({
-    "Scenario": ["Current", "Optimized"],
-    "Avg Time": [current, optimized]
+    "Scenario":["Current","Optimized"],
+    "Avg Time":[current, optimized]
 })
 
-fig = px.bar(
-    compare_df,
-    x="Scenario",
-    y="Avg Time",
-    template="plotly_dark",
-    color="Scenario",
-    color_discrete_sequence=["#00E5FF", "#FF4081"]
-)
+fig = px.bar(compare_df, x="Scenario", y="Avg Time")
 
-st.plotly_chart(fig, use_container_width=True)
+fig.add_annotation(x="Optimized", y=optimized,
+                   text="Improved", showarrow=True)
+
+st.plotly_chart(fig)
+# st.caption("💡 Compare performance")
+st.info("Optimization reduces delivery time.")
+
+
+# # Chart
+# compare_df = pd.DataFrame({
+#     "Scenario": ["Current", "Optimized"],
+#     "Avg Time": [current, optimized]
+# })
+
+# fig = px.bar(
+#     compare_df,
+#     x="Scenario",
+#     y="Avg Time",
+#     template="plotly_dark",
+#     color="Scenario",
+#     color_discrete_sequence=["#00E5FF", "#FF4081"]
+# )
+
+# st.plotly_chart(fig, use_container_width=True)
 
 
 
