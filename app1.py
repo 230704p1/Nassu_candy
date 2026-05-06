@@ -7,18 +7,117 @@ import plotly.express as px
 # =========================
 st.set_page_config(layout="wide")
 
+# ========================= 
+# PREMIUM UI CSS 
+# =========================
+
+st.markdown(""" 
+<style>
+    /* GLOBAL BACKGROUND */ 
+    body { 
+        background: linear-gradient(135deg, #0f172a, #020617); 
+    } 
+    
+    /* CONTAINER */ 
+    .block-container { 
+        padding-top: 1.5rem; 
+        padding-left: 2rem; 
+        padding-right: 2rem; 
+    } 
+    
+    /* SIDEBAR */ 
+    section[data-testid="stSidebar"] { 
+        background: rgba(15, 23, 42, 0.7); 
+        backdrop-filter: blur(12px); 
+        border-right: 1px solid rgba(255,255,255,0.1); 
+    } 
+    /* KPI CARD */ 
+    .card { 
+        background: rgba(255, 255, 255, 0.05); 
+        backdrop-filter: blur(14px); 
+        border-radius: 18px; 
+        padding: 20px; 
+        border: 1px solid white; 
+        transition: all 0.35s ease; 
+        position: relative; 
+        overflow: hidden; 
+        animation: fadeUp 0.6s ease forwards; 
+        margin-bottom : 20px; 
+        } 
+    .card::before { 
+        content: ""; 
+        position: absolute; 
+        width: 120%; 
+        height: 120%; 
+        background: linear-gradient(120deg, transparent, rgba(0,229,255,0.3), transparent); 
+        transform: rotate(25deg); 
+        top: -100%; 
+        left: -100%; 
+        transition: 0.5s; 
+    } 
+    .card:hover::before { 
+        top: 100%; 
+        left: 100%; 
+    } 
+    .card:hover { 
+        transform: translateY(-8px) scale(1.03); 
+        box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2); 
+    } 
+    .card-title {
+        font-size: 18px; 
+        color: #9CA3AF; 
+        font-weight: 600; 
+    } 
+    .card-value { 
+        font-size: 32px; 
+        font-weight: 800; 
+        color: #F9FAFB; 
+    } 
+    /* HEADER GRADIENT */ 
+    h1 { 
+        font-size:42px;    
+        background: linear-gradient(90deg, #00E5FF, #FF4081); 
+        -webkit-background-clip: text; 
+        -webkit-text-fill-color: transparent; 
+    } 
+    /* INPUT STYLES */ 
+    .stSelectbox div[data-baseweb="select"], 
+    .stMultiSelect div[data-baseweb="select"] { 
+        background: rgba(255,255,255,0.05); 
+        border-radius: 10px; 
+        backdrop-filter: blur(10px); 
+    } 
+    /* ANIMATION */ 
+    @keyframes fadeUp { 
+        from { 
+            opacity: 0; 
+            transform: translateY(20px); 
+        } 
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        } 
+    }
+    .card-title{
+        font-size:20px;
+        color:white;               
+    } 
+    </style> 
+    """, unsafe_allow_html=True)
+
+
+
+
 # =========================
 # HEADER
 # =========================
-st.markdown("""
-<h1 style='font-size:48px; font-weight:800; color:#F5F5F5;'>
-Nassau Candy Route Intelligence Dashboard
-</h1>
-<p style='color:#A0A0A0; font-size:22px;'>
-Advanced analytics platform for optimizing logistics, improving delivery efficiency, and maximizing profitability.
-</p>
-""", unsafe_allow_html=True)
-
+st.markdown(""" 
+    <h1 style='color:white, font-size:42px,'>Nassau Candy Route Intelligence Dashboard</h1> 
+    <p style='color:white; font-size:22px;'> 
+    Advanced analytics platform for optimizing logistics, improving delivery efficiency, and maximizing profitability. 
+    </p> 
+    <hr style="border: 1px solid rgba(0,229,255,0.2);"> 
+    """, unsafe_allow_html=True)
 # =========================
 # LOAD DATA
 # =========================
@@ -77,78 +176,46 @@ if filtered_df.empty:
 filtered_df['Late'] = filtered_df['shipping_time'] > 5
 late_orders = filtered_df['Late'].sum()
 risk_profit = filtered_df[filtered_df['Late']]['Gross Profit'].sum()
+ 
 
-st.markdown(""" 
-<style> 
-.card {
-    background: linear-gradient(135deg, #1f2937, #111827); 
-    padding: 20px; 
-    border-radius: 15px; 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5); 
-    text-align: left; 
-    transition: 0.3s; 
-    margin-bottom:20px; 
-    border:2px solid white; 
-} 
-.card:hover { 
-    transform: scale(1.05); 
-} 
-.card-title { 
-    font-size: 20px; 
-    color: white; 
-    font-weight: bold; 
-} 
-.card-value { 
-    font-size: 30px;
-    font-weight: bold; 
-    color: white;
-} 
-</style> 
-""", unsafe_allow_html=True) 
+row1 = st.columns(3)
+row2 = st.columns(3)
 
-col1, col2, col3, col4, col5, col6 = st.columns(6) 
-
-col1.markdown(f"""
-<div class='card'>
+# ROW 1
+row1[0].markdown(f"""<div class='card'>
 <div class='card-title'>Sales</div>
 <div class='card-value'>${filtered_df['Sales'].sum():,.0f}</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
-col2.markdown(f"""
-<div class='card'>
+row1[1].markdown(f"""<div class='card'>
 <div class='card-title'>Profit</div>
 <div class='card-value'>${filtered_df['Gross Profit'].sum():,.0f}</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
-col3.markdown(f"""
-<div class='card'>
+row1[2].markdown(f"""<div class='card'>
 <div class='card-title'>Orders</div>
 <div class='card-value'>{filtered_df.shape[0]}</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
-col4.markdown(f"""
-<div class='card'>
+
+# ROW 2
+row2[0].markdown(f"""<div class='card'>
 <div class='card-title'>Avg Time</div>
 <div class='card-value'>{filtered_df['shipping_time'].mean():.1f} d</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
-col5.markdown(f"""
-<div class='card'>
+row2[1].markdown(f"""<div class='card'>
 <div class='card-title'>Late Orders</div>
 <div class='card-value'>{late_orders}</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
-col6.markdown(f"""
-<div class='card'>
+row2[2].markdown(f"""<div class='card'>
 <div class='card-title'>Risk Impact</div>
 <div class='card-value'>${risk_profit:,.0f}</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
+
+
+
 # =========================
 # TREND CHART
 # =========================
@@ -203,31 +270,6 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # -------------------------
 # TAB 1 - PIE
 # -------------------------
-# with tab1:
-#     region_sales = filtered_df.groupby("Region")["Sales"].sum().reset_index()
-
-#     fig = px.pie(
-#         region_sales,
-#         names="Region",
-#         values="Sales",
-#         hole=0.4,
-#         template="plotly_dark",
-#         color_discrete_sequence=px.colors.sequential.RdBu
-#     )
-#     fig.update_traces(
-#         textfont=dict(color="white", size=14),
-#         textinfo="percent+label"   # show label + %
-#     )
-
-#         # ✅ LEGEND WHITE
-#     fig.update_layout(
-#         legend=dict(font=dict(color="white"))
-#     )
-
-    
-#     st.plotly_chart(fig, use_container_width=True)
-
-
 with tab1:
     region_sales = filtered_df.groupby("Region")["Sales"].sum().reset_index()
     fig = px.pie(region_sales, names="Region", values="Sales", hole=0.4)
@@ -367,8 +409,6 @@ st.subheader("🏭 Factory Optimization Simulator")
 factory = st.selectbox("Factory", ["A","B","C"])
 effect = {"A":1,"B":2,"C":3}
 
-# effect = {"Factory A": 1, "Factory B": 2, "Factory C": 3}
-
 filtered_df['optimized_time'] = (filtered_df['shipping_time'] - effect[factory]).clip(lower=1)
 
 current = filtered_df['shipping_time'].mean()
@@ -387,24 +427,6 @@ fig.add_annotation(x="Optimized", y=optimized,
 st.plotly_chart(fig)
 # st.caption("💡 Compare performance")
 st.info("Optimization reduces delivery time.")
-
-
-# # Chart
-# compare_df = pd.DataFrame({
-#     "Scenario": ["Current", "Optimized"],
-#     "Avg Time": [current, optimized]
-# })
-
-# fig = px.bar(
-#     compare_df,
-#     x="Scenario",
-#     y="Avg Time",
-#     template="plotly_dark",
-#     color="Scenario",
-#     color_discrete_sequence=["#00E5FF", "#FF4081"]
-# )
-
-# st.plotly_chart(fig, use_container_width=True)
 
 
 
