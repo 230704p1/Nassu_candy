@@ -105,19 +105,37 @@ st.markdown("""
     </style> 
     """, unsafe_allow_html=True)
 
-
-
-
 # =========================
 # HEADER
 # =========================
-st.markdown(""" 
-    <h1 style='color:white, font-size:42px,'>Nassau Candy Route Intelligence Dashboard</h1> 
-    <p style='color:white; font-size:22px;'> 
-    Advanced analytics platform for optimizing logistics, improving delivery efficiency, and maximizing profitability. 
-    </p> 
-    <hr style="border: 1px solid rgba(0,229,255,0.2);"> 
-    """, unsafe_allow_html=True)
+
+# LOGO
+st.image("logo/logo1.png", width=900)
+
+# HEADING + SUBHEADING
+st.markdown("""
+<h1 style='
+    text-align:left;
+    margin-top:10px;
+    font-size:52px;
+'>
+Nassau Candy Route Intelligence Dashboard
+</h1>
+
+<p style='
+    color:white;
+    font-size:22px;
+    text-align:left;
+    margin-top:-10px;
+'>
+Advanced analytics platform for optimizing logistics,
+improving delivery efficiency, and maximizing profitability.
+</p>
+
+<hr style="border:1px solid rgba(0,229,255,0.2);">
+
+""", unsafe_allow_html=True)
+
 # =========================
 # LOAD DATA
 # =========================
@@ -401,6 +419,61 @@ with tab4:
     st.plotly_chart(fig, use_container_width=True)
     # st.caption("💡 Hover over map")
     st.info("Some states show higher delays.")
+
+        # =========================
+    # DELIVERY PERFORMANCE RANKING
+    # =========================
+
+    st.subheader("📊 Delivery Performance Ranking")
+
+    slowest = state_avg.sort_values(
+        by="shipping_time",
+        ascending=False
+    ).head(5)
+
+    fastest = state_avg.sort_values(
+        by="shipping_time",
+        ascending=True
+    ).head(5)
+
+    col1, col2 = st.columns(2)
+
+    # 🔴 Slowest States
+    with col1:
+
+        fig1 = px.bar(
+            slowest,
+            x="shipping_time",
+            y="StateCode",
+            orientation='h',
+            title="🔴 Top 5 Slowest States",
+            template="plotly_dark",
+            color="shipping_time",
+            color_continuous_scale="Reds"
+        )
+
+        fig1.update_layout(height=400)
+
+        st.plotly_chart(fig1, use_container_width=True)
+
+    # 🟢 Fastest States
+    with col2:
+
+        fig2 = px.bar(
+            fastest,
+            x="shipping_time",
+            y="StateCode",
+            orientation='h',
+            title="🟢 Top 5 Fastest States",
+            template="plotly_dark",
+            color="shipping_time",
+            color_continuous_scale="Greens"
+        )
+
+        fig2.update_layout(height=400)
+
+        st.plotly_chart(fig2, use_container_width=True)
+
 # =========================
 # FACTORY SIMULATOR
 # =========================
