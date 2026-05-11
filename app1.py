@@ -110,7 +110,7 @@ st.markdown("""
 # =========================
 
 # LOGO
-st.image("logo/logo1.png", width=900)
+st.image("logo/logo (1).png", width=900)
 
 # HEADING + SUBHEADING
 st.markdown("""
