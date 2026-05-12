@@ -119,7 +119,7 @@ st.markdown("""
     margin-top:10px;
     font-size:52px;
 '>
-Nassau Candy Route Intelligence Dashboard
+Nassau Candy Supply Chain Intelligence Platform
 </h1>
 
 <p style='
